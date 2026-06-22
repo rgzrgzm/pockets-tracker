@@ -39,6 +39,7 @@ export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
     : transactions
 
   function handleDelete() {
+    if (!pocket) return
     dispatch({ type: 'DELETE_POCKET', payload: { id: pocket.id } })
     onBack()
   }

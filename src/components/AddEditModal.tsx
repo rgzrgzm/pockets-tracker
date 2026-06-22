@@ -125,7 +125,7 @@ export default function AddEditModal({ pocket, onClose }: AddEditModalProps) {
                     className={`w-8 h-8 rounded-xl transition-all ${
                       color === c ? 'ring-2 ring-offset-2 dark:ring-offset-gray-900 scale-110' : ''
                     }`}
-                    style={{ backgroundColor: c, ringColor: c }}
+                    style={{ backgroundColor: c }}
                   />
                 ))}
               </div>

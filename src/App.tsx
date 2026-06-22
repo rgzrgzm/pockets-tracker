@@ -14,7 +14,7 @@ type View =
 export default function App() {
   const { state, dispatch } = useApp()
   const [view, setView] = useState<View>({ screen: 'dashboard' })
-  const { toasts, addToast, removeToast } = useToast()
+  const { toasts, removeToast } = useToast()
 
   if (!state.isAuth) {
     return <Login />
