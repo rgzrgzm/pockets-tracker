@@ -65,7 +65,7 @@ export default function Dashboard({ onSelectPocket }: DashboardProps) {
 
       <HintBox>
         <p>
-          💡 Each <strong>pocket</strong> is like an "apartado" — a space where you separate money for a
+          💡 Each <strong>pocket</strong> is like a digital envelope — a space where you separate money for a
           specific purpose. Set a <strong>target amount</strong> to track your savings progress with the
           visual bar. Use the <strong>calendar</strong> below to filter by days you made movements.
         </p>

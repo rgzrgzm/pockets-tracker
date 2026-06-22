@@ -2,15 +2,15 @@ import { useApp, getTotalBalance } from '../context/AppContext'
 
 export default function StatsBar() {
   const { state } = useApp()
-  const totalApartado = getTotalBalance(state.pockets, state.transactions)
+  const totalSaved = getTotalBalance(state.pockets, state.transactions)
   const withTarget = state.pockets.filter((p) => p.targetAmount !== null).length
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <StatCard
         emoji="💰"
-        label="Total Apartado"
-        value={`$${totalApartado.toLocaleString()}`}
+        label="Total Saved"
+        value={`$${totalSaved.toLocaleString()}`}
       />
       <StatCard
         emoji="📦"

@@ -59,14 +59,6 @@ export default function App() {
         )}
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-t border-gray-100 dark:border-gray-800/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-10 flex items-center justify-center">
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            a project of <strong>rgzrgzm_code</strong> from <strong>kaizencode</strong>
-          </p>
-        </div>
-      </footer>
-
       <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   )
