@@ -4,7 +4,6 @@ import StatsBar from './StatsBar'
 import CalendarDots from './CalendarDots'
 import SpaceCard from './SpaceCard'
 import AddEditModal from './AddEditModal'
-import HintBox from './HintBox'
 
 interface DashboardProps {
   onSelectPocket: (id: string) => void
@@ -14,6 +13,7 @@ export default function Dashboard({ onSelectPocket }: DashboardProps) {
   const { state } = useApp()
   const [showAddModal, setShowAddModal] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [showCalendar, setShowCalendar] = useState(false)
   const [search, setSearch] = useState('')
 
   const pocketBalances = useMemo(() => {
@@ -48,35 +48,13 @@ export default function Dashboard({ onSelectPocket }: DashboardProps) {
     return list.sort((a, b) => b.balance - a.balance)
   }, [pocketBalances, search, selectedDate, state.transactions])
 
-  return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6 animate-fadeIn pb-20">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
-            🏦 Dashboard
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            Your financial pockets at a glance
-          </p>
-        </div>
-      </div>
+  const hasActiveFilters = selectedDate || search
 
+  return (
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-5 animate-fadeIn pb-20">
       <StatsBar />
 
-      <HintBox>
-        <p>
-          💡 Each <strong>pocket</strong> is like a digital envelope — a space where you separate money for a
-          specific purpose. Set a <strong>target amount</strong> to track your savings progress with the
-          visual bar. Use the <strong>calendar</strong> below to filter by days you made movements.
-        </p>
-      </HintBox>
-
-      <CalendarDots
-        selectedDate={selectedDate}
-        onSelectDate={setSelectedDate}
-      />
-
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
           <input
@@ -90,18 +68,56 @@ export default function Dashboard({ onSelectPocket }: DashboardProps) {
               transition-all text-sm"
           />
         </div>
-        {(selectedDate || search) && (
-          <button
-            onClick={() => {
-              setSelectedDate(null)
-              setSearch('')
-            }}
-            className="text-sm text-indigo-500 dark:text-indigo-400 hover:underline px-2"
-          >
-            Clear filters
-          </button>
-        )}
+        <button
+          onClick={() => setShowCalendar(!showCalendar)}
+          className={`p-2.5 rounded-xl transition-all text-sm ${
+            showCalendar || selectedDate
+              ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 ring-2 ring-indigo-400 dark:ring-indigo-500'
+              : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+          }`}
+          title="Filter by date"
+        >
+          📅
+        </button>
       </div>
+
+      {showCalendar && (
+        <CalendarDots
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
+      )}
+
+      {hasActiveFilters && (
+        <div className="flex items-center gap-2">
+          {selectedDate && (
+            <button
+              onClick={() => setSelectedDate(null)}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium
+                bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300"
+            >
+              📅 {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              <span className="ml-1 hover:text-indigo-900 dark:hover:text-indigo-100">✕</span>
+            </button>
+          )}
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium
+                bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+            >
+              🔍 "{search}"
+              <span className="ml-1 hover:text-gray-900 dark:hover:text-gray-200">✕</span>
+            </button>
+          )}
+          <button
+            onClick={() => { setSelectedDate(null); setSearch('') }}
+            className="text-xs text-indigo-500 dark:text-indigo-400 hover:underline"
+          >
+            Clear all
+          </button>
+        </div>
+      )}
 
       {filteredPockets.length === 0 ? (
         <div className="text-center py-16">
