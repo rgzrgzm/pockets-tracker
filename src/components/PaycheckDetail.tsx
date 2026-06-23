@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
+import { parseLocalDate } from '../types'
 import ExpenseModal from './ExpenseModal'
 
 interface PaycheckDetailProps {
@@ -14,7 +15,7 @@ export default function PaycheckDetail({ periodId, onBack }: PaycheckDetailProps
   const period = state.payPeriods.find((p) => p.id === periodId)
   const expenses = state.payExpenses
     .filter((e) => e.payPeriodId === periodId)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a, b) => parseLocalDate(b.date).getTime() - parseLocalDate(a.date).getTime())
 
   if (!period) {
     return (
@@ -46,7 +47,7 @@ export default function PaycheckDetail({ periodId, onBack }: PaycheckDetailProps
       <div className="bg-white dark:bg-gray-800/80 rounded-3xl p-6 border border-gray-100 dark:border-gray-700/50 shadow-sm border-l-4 border-l-emerald-500">
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-xl font-bold text-gray-800 dark:text-white">
-            🗓️ {new Date(period.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            🗓️ {parseLocalDate(period.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </h1>
           <button
             onClick={handleDeletePeriod}
@@ -112,7 +113,7 @@ export default function PaycheckDetail({ periodId, onBack }: PaycheckDetailProps
                     )}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">
-                    {new Date(ex.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                    {parseLocalDate(ex.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
                   </p>
                 </div>
                 <p className="text-sm font-bold text-red-600 dark:text-red-400">
@@ -136,7 +137,7 @@ export default function PaycheckDetail({ periodId, onBack }: PaycheckDetailProps
           sourceType="pay"
           sourceId={periodId}
           emoji="💰"
-          name={`Paycheck - ${new Date(period.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+          name={`Paycheck - ${parseLocalDate(period.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
           onClose={() => setShowExpenseModal(false)}
         />
       )}

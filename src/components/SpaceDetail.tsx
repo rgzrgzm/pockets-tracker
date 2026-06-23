@@ -2,11 +2,10 @@ import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import { usePocket } from '../hooks/usePocket'
 import { getPocketBalance } from '../lib/balance'
-import { TYPE_LABELS } from '../types'
+import { TYPE_LABELS, parseLocalDate } from '../types'
 import type { Transaction, TransactionType } from '../types'
 import TransactionModal from './TransactionModal'
 import AddEditModal from './AddEditModal'
-import HintBox from './HintBox'
 
 interface SpaceDetailProps {
   pocketId: string
@@ -130,13 +129,6 @@ export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
         </div>
       </div>
 
-      <HintBox>
-        <p>
-          Track every movement in this pocket. Use the <strong>date filter</strong> below to see transactions
-          from a specific day. Add notes to remember what each transaction was for — it helps when you reconcile
-          with your bank statements.
-        </p>
-      </HintBox>
 
       <div className="bg-white dark:bg-gray-800/80 rounded-3xl border border-gray-100 dark:border-gray-700/50 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-100 dark:border-gray-700/50">
@@ -196,7 +188,7 @@ export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
                     )}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">
-                    {new Date(tx.date).toLocaleDateString('en-US', {
+                    {parseLocalDate(tx.date).toLocaleDateString('en-US', {
                       weekday: 'short',
                       year: 'numeric',
                       month: 'short',

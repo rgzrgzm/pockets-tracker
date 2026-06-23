@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
-import { nextFriday } from '../types'
-import HintBox from './HintBox'
+import { nextFriday, parseLocalDate } from '../types'
 
 interface PaycheckSectionProps {
   onSelectPeriod: (id: string) => void
@@ -49,12 +48,6 @@ export default function PaycheckSection({ onSelectPeriod }: PaycheckSectionProps
         </div>
       </div>
 
-      <HintBox>
-        <p>
-          💡 Each pay period starts on <strong>Friday</strong>. Add your paycheck amount, then log every expense
-          against it. The remaining balance updates automatically — overspend and it'll warn you!
-        </p>
-      </HintBox>
 
       {periodsWithTotals.length === 0 && !showAdd && (
         <div className="text-center py-16">
@@ -149,7 +142,7 @@ export default function PaycheckSection({ onSelectPeriod }: PaycheckSectionProps
               >
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-semibold text-gray-800 dark:text-white">
-                    🗓️ {new Date(p.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                    🗓️ {parseLocalDate(p.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
                   </p>
                   <span className="text-xs text-gray-400 dark:text-gray-500">${p.amount.toLocaleString()}</span>
                 </div>

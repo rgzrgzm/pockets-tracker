@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
+import { parseLocalDate } from '../types'
 import ExpenseModal from './ExpenseModal'
 
 interface CardDetailProps {
@@ -14,7 +15,7 @@ export default function CardDetail({ cardId, onBack }: CardDetailProps) {
   const card = state.creditCards.find((c) => c.id === cardId)
   const expenses = state.cardExpenses
     .filter((e) => e.cardId === cardId)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a, b) => parseLocalDate(b.date).getTime() - parseLocalDate(a.date).getTime())
 
   if (!card) {
     return (
@@ -102,7 +103,7 @@ export default function CardDetail({ cardId, onBack }: CardDetailProps) {
                     )}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500">
-                    {new Date(ex.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                    {parseLocalDate(ex.date).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
                   </p>
                 </div>
                 <p className="text-sm font-bold text-red-600 dark:text-red-400">

@@ -148,6 +148,11 @@ export const EXPENSE_CATEGORIES = [
 
 export const CORRECT_PIN = '1997'
 
+export function parseLocalDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+
 export function nextFriday(): string {
   const d = new Date()
   d.setDate(d.getDate() + ((5 - d.getDay() + 7) % 7 || 7))
