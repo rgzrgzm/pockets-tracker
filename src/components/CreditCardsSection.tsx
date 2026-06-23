@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import AddCardModal from './AddCardModal'
-import HintBox from './HintBox'
 
 interface CreditCardsSectionProps {
   onSelectCard: (id: string) => void
@@ -30,12 +29,6 @@ export default function CreditCardsSection({ onSelectCard }: CreditCardsSectionP
         </div>
       </div>
 
-      <HintBox>
-        <p>
-          💡 Add each of your credit cards, then log every expense. You'll see exactly how much you spent on each
-          card — useful for tracking limits, due dates, and spending habits.
-        </p>
-      </HintBox>
 
       {cardsWithTotals.length === 0 ? (
         <div className="text-center py-16">
