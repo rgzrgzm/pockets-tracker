@@ -133,6 +133,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', state.theme === 'dark')
+    const meta = document.querySelector('meta[name="theme-color"]:not([media])')
+    if (meta) meta.setAttribute('content', state.theme === 'dark' ? '#030712' : '#f9fafb')
   }, [state.theme])
 
   const fetchData = useCallback(async () => {
