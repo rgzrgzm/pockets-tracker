@@ -1,4 +1,5 @@
-import { useApp, getPocketBalance } from '../context/AppContext'
+import { useApp } from '../context/AppContext'
+import { getPocketBalance } from '../lib/balance'
 import type { Pocket } from '../types'
 import { TYPE_LABELS } from '../types'
 

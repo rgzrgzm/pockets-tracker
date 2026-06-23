@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useApp } from '../context/AppContext'
-import type { Pocket, Transaction, TransactionType } from '../types'
+import type { Pocket, TransactionType } from '../types'
 
 interface TransactionModalProps {
   pocket: Pocket
@@ -13,27 +13,24 @@ export default function TransactionModal({
   type,
   onClose,
 }: TransactionModalProps) {
-  const { dispatch } = useApp()
+  const { actions } = useApp()
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [note, setNote] = useState('')
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const numAmount = Number(amount)
     if (!numAmount || numAmount <= 0) return
 
-    const transaction: Transaction = {
-      id: crypto.randomUUID(),
+    await actions.addTransaction({
       pocketId: pocket.id,
       type,
       amount: numAmount,
       date,
       note: note.trim(),
-      createdAt: new Date().toISOString(),
-    }
+    })
 
-    dispatch({ type: 'ADD_TRANSACTION', payload: transaction })
     onClose()
   }
 

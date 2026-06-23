@@ -27,7 +27,9 @@ export interface AppState {
   pockets: Pocket[]
   transactions: Transaction[]
   theme: Theme
-  isAuth: boolean
+  loading: boolean
+  sessionReady: boolean
+  isLoggedIn: boolean
 }
 
 export type AppAction =
@@ -39,6 +41,9 @@ export type AppAction =
   | { type: 'DELETE_POCKET'; payload: { id: string } }
   | { type: 'ADD_TRANSACTION'; payload: Transaction }
   | { type: 'DELETE_TRANSACTION'; payload: { id: string } }
+  | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_SESSION'; payload: boolean }
+  | { type: 'LOAD_DATA'; payload: { pockets: Pocket[]; transactions: Transaction[] } }
 
 export const POCKET_COLORS = [
   '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
@@ -59,3 +64,5 @@ export const TYPE_LABELS: Record<PocketType, string> = {
   goal: '🎯 Goal',
   flexible: '📦 Flexible',
 }
+
+export const CORRECT_PIN = '1997'

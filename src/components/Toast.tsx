@@ -1,7 +1,7 @@
-import type { Toast as ToastType } from '../hooks/useToast'
+import type { Toast } from '../context/ToastContext'
 
 interface ToastContainerProps {
-  toasts: ToastType[]
+  toasts: Toast[]
   onRemove: (id: string) => void
 }
 

@@ -1,4 +1,5 @@
-import { useApp, getTotalBalance } from '../context/AppContext'
+import { useApp } from '../context/AppContext'
+import { getTotalBalance } from '../lib/balance'
 
 export default function StatsBar() {
   const { state } = useApp()

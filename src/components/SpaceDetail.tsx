@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { useApp, usePocket, getPocketBalance } from '../context/AppContext'
+import { useApp } from '../context/AppContext'
+import { usePocket } from '../hooks/usePocket'
+import { getPocketBalance } from '../lib/balance'
 import { TYPE_LABELS } from '../types'
 import type { TransactionType } from '../types'
 import TransactionModal from './TransactionModal'
@@ -12,7 +14,7 @@ interface SpaceDetailProps {
 }
 
 export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
-  const { state, dispatch } = useApp()
+  const { state, actions } = useApp()
   const { pocket, transactions } = usePocket(pocketId)
   const [showTxModal, setShowTxModal] = useState<TransactionType | null>(null)
   const [showEditModal, setShowEditModal] = useState(false)
@@ -40,7 +42,7 @@ export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
 
   function handleDelete() {
     if (!pocket) return
-    dispatch({ type: 'DELETE_POCKET', payload: { id: pocket.id } })
+    actions.deletePocket(pocket.id)
     onBack()
   }
 
@@ -207,12 +209,7 @@ export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
                   {tx.type === 'deposit' ? '+' : '-'}${tx.amount.toLocaleString()}
                 </p>
                 <button
-                  onClick={() =>
-                    dispatch({
-                      type: 'DELETE_TRANSACTION',
-                      payload: { id: tx.id },
-                    })
-                  }
+                  onClick={() => actions.deleteTransaction(tx.id)}
                   className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all text-sm"
                   title="Delete transaction"
                 >

@@ -1,27 +1,34 @@
 import { useState } from 'react'
 import { useApp } from './context/AppContext'
+import { useToast } from './context/ToastContext'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import SpaceDetail from './components/SpaceDetail'
 import ThemeToggle from './components/ThemeToggle'
 import ToastContainer from './components/Toast'
-import { useToast } from './hooks/useToast'
 
 type View =
   | { screen: 'dashboard' }
   | { screen: 'detail'; pocketId: string }
 
 export default function App() {
-  const { state, dispatch } = useApp()
-  const [view, setView] = useState<View>({ screen: 'dashboard' })
+  const { state, actions } = useApp()
   const { toasts, removeToast } = useToast()
+  const [view, setView] = useState<View>({ screen: 'dashboard' })
 
-  if (!state.isAuth) {
-    return <Login />
+  if (!state.sessionReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="text-center animate-pulse">
+          <p className="text-4xl mb-2">🏦</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm">Loading...</p>
+        </div>
+      </div>
+    )
   }
 
-  function handleLogout() {
-    dispatch({ type: 'LOGOUT' })
+  if (!state.isLoggedIn) {
+    return <Login />
   }
 
   return (
@@ -35,7 +42,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
-              onClick={handleLogout}
+              onClick={actions.logout}
               className="px-3 py-2 rounded-xl text-sm font-medium text-gray-500 dark:text-gray-400
                 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-all"
             >
@@ -46,16 +53,34 @@ export default function App() {
       </header>
 
       <main>
-        {view.screen === 'dashboard' && (
-          <Dashboard onSelectPocket={(id) => setView({ screen: 'detail', pocketId: id })} />
-        )}
-        {view.screen === 'detail' && (
-          <div className="max-w-4xl mx-auto p-4 sm:p-6 pb-20">
-            <SpaceDetail
-              pocketId={view.pocketId}
-              onBack={() => setView({ screen: 'dashboard' })}
-            />
+        {state.loading && state.pockets.length === 0 ? (
+          <div className="max-w-6xl mx-auto p-4 sm:p-6 animate-pulse space-y-4">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-2xl w-48" />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-2xl" />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-48 bg-gray-200 dark:bg-gray-700 rounded-2xl" />
+              ))}
+            </div>
           </div>
+        ) : (
+          <>
+            {view.screen === 'dashboard' && (
+              <Dashboard onSelectPocket={(id) => setView({ screen: 'detail', pocketId: id })} />
+            )}
+            {view.screen === 'detail' && (
+              <div className="max-w-4xl mx-auto p-4 sm:p-6 pb-20">
+                <SpaceDetail
+                  pocketId={view.pocketId}
+                  onBack={() => setView({ screen: 'dashboard' })}
+                />
+              </div>
+            )}
+          </>
         )}
       </main>
 

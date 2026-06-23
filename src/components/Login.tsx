@@ -1,18 +1,32 @@
 import { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from 'react'
 import { useApp } from '../context/AppContext'
 
-const CORRECT_PIN = '1997'
-
 export default function Login() {
-  const { dispatch, state } = useApp()
+  const { actions, state } = useApp()
   const [pin, setPin] = useState<string[]>(Array(4).fill(''))
   const [error, setError] = useState(false)
   const [shake, setShake] = useState(false)
+  const [loading, setLoading] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   useEffect(() => {
     inputRefs.current[0]?.focus()
   }, [])
+
+  async function attemptLogin(entered: string) {
+    setLoading(true)
+    const ok = await actions.login(entered)
+    setLoading(false)
+    if (!ok) {
+      setError(true)
+      setShake(true)
+      setTimeout(() => setShake(false), 400)
+      setTimeout(() => {
+        setPin(Array(4).fill(''))
+        inputRefs.current[0]?.focus()
+      }, 500)
+    }
+  }
 
   function handleChange(index: number, value: string) {
     if (!/^\d*$/.test(value)) return
@@ -27,18 +41,7 @@ export default function Login() {
     }
 
     if (index === 3 && digit) {
-      const entered = newPin.join('')
-      if (entered === CORRECT_PIN) {
-        dispatch({ type: 'LOGIN' })
-      } else {
-        setError(true)
-        setShake(true)
-        setTimeout(() => setShake(false), 400)
-        setTimeout(() => {
-          setPin(Array(4).fill(''))
-          inputRefs.current[0]?.focus()
-        }, 500)
-      }
+      attemptLogin(newPin.join(''))
     }
   }
 
@@ -50,18 +53,7 @@ export default function Login() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    const entered = pin.join('')
-    if (entered === CORRECT_PIN) {
-      dispatch({ type: 'LOGIN' })
-    } else {
-      setError(true)
-      setShake(true)
-      setTimeout(() => setShake(false), 400)
-      setTimeout(() => {
-        setPin(Array(4).fill(''))
-        inputRefs.current[0]?.focus()
-      }, 500)
-    }
+    if (!loading) attemptLogin(pin.join(''))
   }
 
   function handlePaste(e: React.ClipboardEvent) {
@@ -73,27 +65,14 @@ export default function Login() {
     }
     setPin(newPin)
     if (text.length === 4) {
-      if (text === CORRECT_PIN) {
-        dispatch({ type: 'LOGIN' })
-      } else {
-        setError(true)
-        setShake(true)
-        setTimeout(() => setShake(false), 400)
-        setTimeout(() => {
-          setPin(Array(4).fill(''))
-          inputRefs.current[0]?.focus()
-        }, 500)
-      }
+      attemptLogin(text)
     } else {
       inputRefs.current[Math.min(text.length, 3)]?.focus()
     }
   }
 
   function toggleTheme() {
-    dispatch({
-      type: 'SET_THEME',
-      payload: state.theme === 'light' ? 'dark' : 'light',
-    })
+    actions.setTheme(state.theme === 'light' ? 'dark' : 'light')
   }
 
   return (
@@ -151,6 +130,7 @@ export default function Login() {
                     }
                     focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-200 dark:focus:ring-indigo-900/30
                     text-gray-800 dark:text-white`}
+                  disabled={loading}
                 />
               ))}
             </div>
@@ -163,13 +143,13 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={pin.some((d) => !d)}
+            disabled={pin.some((d) => !d) || loading}
             className="w-full py-3 rounded-2xl font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600
               hover:from-indigo-600 hover:to-purple-700 disabled:opacity-40 disabled:cursor-not-allowed
               transition-all shadow-lg shadow-indigo-300 dark:shadow-indigo-900/40
               active:scale-[0.98]"
           >
-            🔓 Unlock
+            {loading ? '⏳ Unlocking...' : '🔓 Unlock'}
           </button>
         </div>
 

@@ -9,7 +9,7 @@ interface AddEditModalProps {
 }
 
 export default function AddEditModal({ pocket, onClose }: AddEditModalProps) {
-  const { dispatch } = useApp()
+  const { actions } = useApp()
   const editing = !!pocket
 
   const [name, setName] = useState(pocket?.name ?? '')
@@ -20,36 +20,26 @@ export default function AddEditModal({ pocket, onClose }: AddEditModalProps) {
     pocket?.targetAmount?.toString() ?? ''
   )
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
 
     if (editing && pocket) {
-      dispatch({
-        type: 'UPDATE_POCKET',
-        payload: {
-          id: pocket.id,
-          updates: {
-            name: name.trim(),
-            emoji,
-            color,
-            type,
-            targetAmount: targetAmount ? Number(targetAmount) : null,
-          },
-        },
-      })
-    } else {
-      const newPocket: Pocket = {
-        id: crypto.randomUUID(),
+      await actions.updatePocket(pocket.id, {
         name: name.trim(),
         emoji,
         color,
         type,
         targetAmount: targetAmount ? Number(targetAmount) : null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      dispatch({ type: 'ADD_POCKET', payload: newPocket })
+      })
+    } else {
+      await actions.createPocket({
+        name: name.trim(),
+        emoji,
+        color,
+        type,
+        targetAmount: targetAmount ? Number(targetAmount) : null,
+      })
     }
 
     onClose()
