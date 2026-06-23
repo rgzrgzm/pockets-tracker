@@ -150,7 +150,9 @@ export const CORRECT_PIN = '1997'
 
 export function nextFriday(): string {
   const d = new Date()
-  const daysUntilFriday = (5 - d.getDay() + 7) % 7
-  d.setDate(d.getDate() + daysUntilFriday)
-  return d.toISOString().slice(0, 10)
+  d.setDate(d.getDate() + ((5 - d.getDay() + 7) % 7 || 7))
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }

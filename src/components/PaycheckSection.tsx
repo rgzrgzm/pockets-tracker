@@ -79,7 +79,7 @@ export default function PaycheckSection({ onSelectPeriod }: PaycheckSectionProps
         >
           <h2 className="font-bold text-gray-800 dark:text-white">📅 New Pay Period</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-            🗓️ Next payday: <strong>{new Date(nextFriday()).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</strong>
+            🗓️ Next payday: <strong>{(() => { const [y, m, d] = nextFriday().split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) })()}</strong>
           </p>
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 font-bold text-lg">$</span>
