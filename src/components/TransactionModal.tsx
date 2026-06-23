@@ -1,35 +1,48 @@
 import { useState, type FormEvent } from 'react'
 import { useApp } from '../context/AppContext'
-import type { Pocket, TransactionType } from '../types'
+import type { Pocket, Transaction, TransactionType } from '../types'
 
 interface TransactionModalProps {
   pocket: Pocket
   type: TransactionType
+  transaction?: Transaction
   onClose: () => void
 }
 
 export default function TransactionModal({
   pocket,
   type,
+  transaction,
   onClose,
 }: TransactionModalProps) {
   const { actions } = useApp()
-  const [amount, setAmount] = useState('')
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
-  const [note, setNote] = useState('')
+  const editing = !!transaction
+
+  const [amount, setAmount] = useState(transaction?.amount.toString() ?? '')
+  const [date, setDate] = useState(transaction?.date ?? new Date().toISOString().slice(0, 10))
+  const [note, setNote] = useState(transaction?.note ?? '')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const numAmount = Number(amount)
     if (!numAmount || numAmount <= 0) return
 
-    await actions.addTransaction({
-      pocketId: pocket.id,
-      type,
-      amount: numAmount,
-      date,
-      note: note.trim(),
-    })
+    if (editing && transaction) {
+      await actions.updateTransaction(transaction.id, {
+        type,
+        amount: numAmount,
+        date,
+        note: note.trim(),
+      })
+    } else {
+      await actions.addTransaction({
+        pocketId: pocket.id,
+        type,
+        amount: numAmount,
+        date,
+        note: note.trim(),
+      })
+    }
 
     onClose()
   }
@@ -40,7 +53,7 @@ export default function TransactionModal({
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-800 dark:text-white">
-              {type === 'deposit' ? '💰 Add Money' : '💸 Withdraw Money'}
+              {editing ? '✏️ Edit Transaction' : type === 'deposit' ? '💰 Add Money' : '💸 Withdraw Money'}
             </h2>
             <button
               onClick={onClose}
@@ -55,7 +68,7 @@ export default function TransactionModal({
             <div>
               <p className="font-semibold text-gray-800 dark:text-white">{pocket.name}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {type === 'deposit' ? 'Adding to' : 'Withdrawing from'} this pocket
+                {editing ? 'Editing this transaction' : type === 'deposit' ? 'Adding to' : 'Withdrawing from'} this pocket
               </p>
             </div>
           </div>
@@ -136,7 +149,7 @@ export default function TransactionModal({
                     : 'bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700'
                   }`}
               >
-                {type === 'deposit' ? '💰 Confirm Deposit' : '💸 Confirm Withdrawal'}
+                {editing ? '💾 Save Changes' : type === 'deposit' ? '💰 Confirm Deposit' : '💸 Confirm Withdrawal'}
               </button>
             </div>
           </form>

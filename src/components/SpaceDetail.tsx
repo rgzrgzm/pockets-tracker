@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext'
 import { usePocket } from '../hooks/usePocket'
 import { getPocketBalance } from '../lib/balance'
 import { TYPE_LABELS } from '../types'
-import type { TransactionType } from '../types'
+import type { Transaction, TransactionType } from '../types'
 import TransactionModal from './TransactionModal'
 import AddEditModal from './AddEditModal'
 import HintBox from './HintBox'
@@ -13,10 +13,15 @@ interface SpaceDetailProps {
   onBack: () => void
 }
 
+interface TxModalState {
+  type: TransactionType
+  transaction?: Transaction
+}
+
 export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
   const { state, actions } = useApp()
   const { pocket, transactions } = usePocket(pocketId)
-  const [showTxModal, setShowTxModal] = useState<TransactionType | null>(null)
+  const [txModal, setTxModal] = useState<TxModalState | null>(null)
   const [showEditModal, setShowEditModal] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [dateFilter, setDateFilter] = useState('')
@@ -95,14 +100,14 @@ export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
 
         <div className="flex flex-wrap gap-2 mt-5">
           <button
-            onClick={() => setShowTxModal('deposit')}
+            onClick={() => setTxModal({ type: 'deposit' })}
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl font-medium text-white bg-gradient-to-r from-emerald-500 to-green-600
               hover:from-emerald-600 hover:to-green-700 transition-all shadow-sm active:scale-95"
           >
             💰 Add Money
           </button>
           <button
-            onClick={() => setShowTxModal('withdrawal')}
+            onClick={() => setTxModal({ type: 'withdrawal' })}
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl font-medium text-white bg-gradient-to-r from-orange-500 to-red-600
               hover:from-orange-600 hover:to-red-700 transition-all shadow-sm active:scale-95"
           >
@@ -176,7 +181,7 @@ export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
             {filteredTxs.map((tx) => (
               <div
                 key={tx.id}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors group"
               >
                 <span className="text-xl">
                   {tx.type === 'deposit' ? '💰' : '💸'}
@@ -208,24 +213,34 @@ export default function SpaceDetail({ pocketId, onBack }: SpaceDetailProps) {
                 >
                   {tx.type === 'deposit' ? '+' : '-'}${tx.amount.toLocaleString()}
                 </p>
-                <button
-                  onClick={() => actions.deleteTransaction(tx.id)}
-                  className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all text-sm"
-                  title="Delete transaction"
-                >
-                  ✕
-                </button>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                  <button
+                    onClick={() => setTxModal({ type: tx.type, transaction: tx })}
+                    className="text-gray-400 hover:text-indigo-500 transition-all text-sm p-1"
+                    title="Edit transaction"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => actions.deleteTransaction(tx.id)}
+                    className="text-gray-400 hover:text-red-500 transition-all text-sm p-1"
+                    title="Delete transaction"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {showTxModal && (
+      {txModal && (
         <TransactionModal
           pocket={pocket}
-          type={showTxModal}
-          onClose={() => setShowTxModal(null)}
+          type={txModal.type}
+          transaction={txModal.transaction}
+          onClose={() => setTxModal(null)}
         />
       )}
 

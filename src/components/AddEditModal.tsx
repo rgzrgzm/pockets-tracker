@@ -14,11 +14,25 @@ export default function AddEditModal({ pocket, onClose }: AddEditModalProps) {
 
   const [name, setName] = useState(pocket?.name ?? '')
   const [emoji, setEmoji] = useState(pocket?.emoji ?? '💰')
-  const [color, setColor] = useState(pocket?.color ?? POCKET_COLORS[0])
+  const [color, setColor] = useState(
+    () => pocket?.color ?? POCKET_COLORS[Math.floor(Math.random() * POCKET_COLORS.length)]
+  )
+  const [randomColor, setRandomColor] = useState(!pocket)
   const [type, setType] = useState<PocketType>(pocket?.type ?? 'flexible')
   const [targetAmount, setTargetAmount] = useState(
     pocket?.targetAmount?.toString() ?? ''
   )
+
+  function handlePickColor(c: string) {
+    setColor(c)
+    setRandomColor(false)
+  }
+
+  function handleRandomColor() {
+    const available = POCKET_COLORS.filter((c) => c !== color)
+    setColor(available[Math.floor(Math.random() * available.length)])
+    setRandomColor(true)
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -106,14 +120,26 @@ export default function AddEditModal({ pocket, onClose }: AddEditModalProps) {
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1.5">
                 Color
               </label>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap items-center">
+                <button
+                  type="button"
+                  onClick={handleRandomColor}
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all ${
+                    randomColor
+                      ? 'ring-2 ring-offset-2 dark:ring-offset-gray-900 scale-110 bg-indigo-100 dark:bg-indigo-900/50'
+                      : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                  title="Random color"
+                >
+                  🔄
+                </button>
                 {POCKET_COLORS.map((c) => (
                   <button
                     key={c}
                     type="button"
-                    onClick={() => setColor(c)}
+                    onClick={() => handlePickColor(c)}
                     className={`w-8 h-8 rounded-xl transition-all ${
-                      color === c ? 'ring-2 ring-offset-2 dark:ring-offset-gray-900 scale-110' : ''
+                      color === c && !randomColor ? 'ring-2 ring-offset-2 dark:ring-offset-gray-900 scale-110' : ''
                     }`}
                     style={{ backgroundColor: c }}
                   />

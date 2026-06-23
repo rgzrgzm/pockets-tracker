@@ -99,6 +99,13 @@ function appReducer(state: AppState, action: AppAction): AppState {
       }
     case 'ADD_TRANSACTION':
       return { ...state, transactions: [...state.transactions, action.payload] }
+    case 'UPDATE_TRANSACTION':
+      return {
+        ...state,
+        transactions: state.transactions.map((t) =>
+          t.id === action.payload.id ? { ...t, ...action.payload.updates } : t
+        ),
+      }
     case 'DELETE_TRANSACTION':
       return {
         ...state,
@@ -139,6 +146,12 @@ export interface AppActions {
   deletePocket: (id: string) => Promise<void>
   addTransaction: (data: {
     pocketId: string
+    type: TransactionType
+    amount: number
+    date: string
+    note: string
+  }) => Promise<void>
+  updateTransaction: (id: string, data: {
     type: TransactionType
     amount: number
     date: string
@@ -343,6 +356,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'ADD_TRANSACTION', payload: mapTransaction(transaction as TransactionRow) })
   }, [addToast])
 
+  const updateTransaction = useCallback(async (id: string, data: {
+    type: TransactionType
+    amount: number
+    date: string
+    note: string
+  }) => {
+    const { error } = await supabase
+      .from('transactions')
+      .update({
+        type: data.type,
+        amount: data.amount,
+        date: data.date,
+        note: data.note,
+      })
+      .eq('id', id)
+
+    if (error) {
+      addToast(error.message, 'error')
+      return
+    }
+
+    dispatch({
+      type: 'UPDATE_TRANSACTION',
+      payload: {
+        id,
+        updates: {
+          type: data.type,
+          amount: data.amount,
+          date: data.date,
+          note: data.note.trim(),
+        },
+      },
+    })
+  }, [addToast])
+
   const deleteTransaction = useCallback(async (id: string) => {
     const { error } = await supabase.from('transactions').delete().eq('id', id)
 
@@ -362,6 +410,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updatePocket,
     deletePocket,
     addTransaction,
+    updateTransaction,
     deleteTransaction,
   }
 

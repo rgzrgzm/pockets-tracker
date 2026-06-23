@@ -40,6 +40,7 @@ export type AppAction =
   | { type: 'UPDATE_POCKET'; payload: { id: string; updates: Partial<Pocket> } }
   | { type: 'DELETE_POCKET'; payload: { id: string } }
   | { type: 'ADD_TRANSACTION'; payload: Transaction }
+  | { type: 'UPDATE_TRANSACTION'; payload: { id: string; updates: Partial<Transaction> } }
   | { type: 'DELETE_TRANSACTION'; payload: { id: string } }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_SESSION'; payload: boolean }
