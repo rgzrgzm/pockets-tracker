@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useApp } from './context/AppContext'
 import { useToast } from './context/ToastContext'
 import type { Tab } from './types'
@@ -29,6 +29,10 @@ export default function App() {
   const { toasts, removeToast } = useToast()
   const [activeTab, setActiveTab] = useState<Tab>('pockets')
   const [view, setView] = useState<View>({ screen: 'dashboard' })
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [view, activeTab])
 
   if (!state.sessionReady) {
     return (
